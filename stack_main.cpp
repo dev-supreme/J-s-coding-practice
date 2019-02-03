@@ -41,7 +41,7 @@ int main(int argc, const char * argv[]) {
 
 void push(int data)
 {
-    if (top == STACK_SIZE)
+    if (top == STACK_SIZE - 1)
     {
         cout << "overflow! " << endl;
         return;
