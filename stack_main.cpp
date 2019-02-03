@@ -11,61 +11,95 @@
 #include <iostream>
 using namespace std;
 
+typedef struct node
+{
+    int nData;
+    node* pPrev;
+}node;
 
-void push(int);
-int pop(void);
+
+node* top;
 const int STACK_SIZE = 5;
-int stack[STACK_SIZE] = {0, };
-int top = -1;
+int currentStackSize = 0;
+
+
+void push(int, node**);
+int pop(node**);
+//int popAllStack(void);
+
+
 
 int main(int argc, const char * argv[]) {
     // insert code here...
     
     
-    push(11);
-    push(22);
-    pop();
-    pop();
-    pop();
-    push(33);
-    push(44);
-    push(55);
-    push(66);
-    pop();
-
-    
+    push(11, &top);
+    push(22, &top);
+    pop(&top);
+    pop(&top);
+    pop(&top);
+    push(33, &top);
+    push(44, &top);
+    push(55, &top);
+    push(66, &top);
+    pop(&top);
+    push(77, &top);
+    push(88, &top);
+    push(99, &top);
+    push(111, &top);
   
     return 0;
 }
 
 
-void push(int data)
+void push(int data, node** topAddr)
 {
-    if (top == STACK_SIZE - 1)
+    node* top = *topAddr;
+    node* newNode = (node*)malloc(sizeof(node));
+    newNode->nData = data;
+    newNode->pPrev = NULL;
+    
+    
+    
+    if (currentStackSize >= STACK_SIZE)
     {
-        cout << "overflow! " << endl;
+        cout << "push(" << data << "): " << "overflow! " << endl;
         return;
+    }
+    else if(currentStackSize == 0)
+    {
+        *topAddr = newNode;
+        currentStackSize++;
     }
     else
     {
-        cout << "push() " << "data: " << data << " top: " << top + 1 << endl;
-        stack[++top] = data;
+        newNode->pPrev = top;
+        *topAddr = newNode;
+        currentStackSize++;
     }
+    
+    cout << "push(" << data << "), " << "stackSize: " << currentStackSize << endl;
+    
 }
 
 
-int pop(void)
+int pop(node** topAddr)
 {
+    node* top = *topAddr;
     int data = 0;
-    if (top == -1)
+    if (currentStackSize <= 0)
     {
-        cout << "underflow! " << endl;
+        cout << "pop(): underflow! " << endl;
         return 0;
     }
     else
     {
-        cout << "pop() " << "data: "<< data << " top " << top << endl;
-        data = stack[top--];
+        data = top->nData;
+        *topAddr = top->pPrev;
+        currentStackSize--;
+        cout << "pop(): " << data << " stackSize: " << currentStackSize << endl;
+        
         return data;
     }
+    
 }
