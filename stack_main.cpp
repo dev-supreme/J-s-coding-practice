@@ -14,18 +14,18 @@ using namespace std;
 typedef struct node
 {
     int nData;
-    node* pPrev;
+    node* pNext;
 }node;
 
 
-node* top;
-const int STACK_SIZE = 5;
-int currentStackSize = 0;
+node* input;
+node* output;
+const int QUEUE_SIZE = 5;
+int currentQueueSize = 0;
 
 
-void push(int, node**);
+void push(int, node**, node**);
 int pop(node**);
-//int popAllStack(void);
 
 
 
@@ -33,73 +33,86 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     
     
-    push(11, &top);
-    push(22, &top);
-    pop(&top);
-    pop(&top);
-    pop(&top);
-    push(33, &top);
-    push(44, &top);
-    push(55, &top);
-    push(66, &top);
-    pop(&top);
-    push(77, &top);
-    push(88, &top);
-    push(99, &top);
-    push(111, &top);
+    push(11, &input, &output);
+    push(22, &input, &output);
+    pop(&output);
+    pop(&output);
+    pop(&output);
+    push(33, &input, &output);
+    push(44, &input, &output);
+    push(55, &input, &output);
+    push(66, &input, &output);
+    pop(&output);
+    push(77, &input, &output);
+    push(88, &input, &output);
+    push(99, &input, &output);
+    push(111, &input, &output);
   
     return 0;
 }
 
 
-void push(int data, node** topAddr)
+void push(int data, node** inputAddr, node** outputAddr)
 {
-    node* top = *topAddr;
+//    node* input = *inputAddr;
+    node* output = *outputAddr;
+    
     node* newNode = (node*)malloc(sizeof(node));
     newNode->nData = data;
-    newNode->pPrev = NULL;
+    newNode->pNext = NULL;
     
     
-    
-    if (currentStackSize >= STACK_SIZE)
+    if (currentQueueSize >= QUEUE_SIZE)
     {
-        cout << "push(" << data << "): " << "overflow! " << endl;
+        cout << "push(" << data << "): overflow!" << endl;
         return;
     }
-    else if(currentStackSize == 0)
+    else if (currentQueueSize <= 0) // 새 노드가 큐의 첫 노드라면,
     {
-        *topAddr = newNode;
-        currentStackSize++;
+        *outputAddr = newNode;
+        *inputAddr = newNode;
+      
+        currentQueueSize++;
+        cout << "push(" << data << "), currentQueueSize: " << currentQueueSize << endl;
     }
     else
     {
-        newNode->pPrev = top;
-        *topAddr = newNode;
-        currentStackSize++;
+        output->pNext = newNode;
+        *inputAddr = newNode;
+        
+        currentQueueSize++;
+        cout << "push(" << data << "), currentQueueSize: " << currentQueueSize << endl;
     }
-    
-    cout << "push(" << data << "), " << "stackSize: " << currentStackSize << endl;
-    
 }
 
 
-int pop(node** topAddr)
+int pop(node** outputAddr)
 {
-    node* top = *topAddr;
     int data = 0;
-    if (currentStackSize <= 0)
+    node* output = *outputAddr;
+    
+    if (currentQueueSize <= 0)
     {
         cout << "pop(): underflow! " << endl;
         return 0;
     }
     else
     {
-        data = top->nData;
-        *topAddr = top->pPrev;
-        currentStackSize--;
-        cout << "pop(): " << data << " stackSize: " << currentStackSize << endl;
-        
-        return data;
+        data = output->nData;
+        *outputAddr = output->pNext;
+        currentQueueSize--;
+        cout << "pop(): " << data << " currentQueueSize: " << currentQueueSize << endl;
+        free(output);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    return data;
     
 }
