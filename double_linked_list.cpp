@@ -22,11 +22,11 @@ typedef struct node
 
 class listData
 {
-private:
+private:    // 클래스 내부에서는 생각없이 쓸 수 있지만, 클래스 외부에서는 반환만 하는 함수없이는 쓸 수 없다.
     
-    int nodeCount;
-    int nDataSum;
-    float mid;
+    int nodeCount;  // 노드 개수.
+    int nDataSum;   // nData 총합.
+    float mid;      // 모든 노드들의 nData 평균.
     
 public:
     
@@ -37,34 +37,32 @@ public:
         mid = 0;
     }
     
-    float insertNodeData(int nodeData)
+    void insertNodeData(int nodeData)   // 이 함수로 mid를 반환할 이유가 없으므로 반환형을 float->void 변경.
     {
         nDataSum += nodeData;
         nodeCount++;
 
         mid = nDataSum / nodeCount;
-        return mid;
     }
     
-    float deleteNodeData(int nodeData)
+    void deleteNodeData(int nodeData)   // 이 함수로 mid를 반환할 이유가 없으므로 반환형을 float->void 변경.
     {
         nDataSum -= nodeData;
         nodeCount--;
 
         mid = nDataSum / nodeCount;
-        return mid;
     }
     
-    float* setMid(void)
+    float setMid(void)                  // mid의 값만 클래스 외부에 전달하면 되므로 반환형을 float*->float으로 변경.
     {
-        return &mid;
+        return mid;
     }
 };
 
 
 node* head = NULL;
 node* tail = NULL;
-listData oListData;
+listData oListData; // 객체를 전역변수로 만들면 매번 생성자를 실행시킬 필요가 없다.
 
 
 
@@ -150,8 +148,6 @@ void insert(int data, node** headAddr, node** tailAddr)
     newNode->pPrev = NULL;
     oListData.insertNodeData(data);
     
-
-    
     if (*headAddr == NULL && *tailAddr == NULL)    // 링크상의 노드가 하나도 없다면,
     {
         *headAddr = newNode;
@@ -159,32 +155,11 @@ void insert(int data, node** headAddr, node** tailAddr)
     }
     else
     {
-        
         node* pHead = *headAddr;
         node* pTail = *tailAddr;
+        float mid = oListData.setMid();
         
-        
-//        float mid;    // 모든 노드들이 가진 nData의 평균값.
-//
-//        // mid 구하기는 새 구조체로 이전.
-//        int nDataSum = 0;
-//        int nodeCount = 0;
-//        while ( pHead != NULL )
-//        {
-//            nDataSum += pHead->nData;
-//            pHead = pHead->pNext;
-//            nodeCount++;
-//        }
-//        mid = nDataSum / nodeCount;
-//        //        printf("nDataSum: %d, nodeCount: %d, mid: %f \n", nDataSum, nodeCount, mid);    // mid값 중간 확인.
-//
-//        pHead = *headAddr;    // 위에서 사용한 pHead 초기화.
-        
-        
-        
-      
-        
-        if (newNode->nData <= *(oListData.setMid()))    // 노드가 head에 가깝거나 정 가운데일때,
+        if (newNode->nData <= mid)    // 노드가 head에 가깝거나 정 가운데일때,
         {
             if (!pHead->pNext || pHead->nData > newNode->nData)    // 리스트에 노드가 한개뿐일때 혹은 새 노드의 데이타가 최소값일때,
             {
@@ -206,7 +181,7 @@ void insert(int data, node** headAddr, node** tailAddr)
                 pHead->pNext = newNode;
             }
         }
-        else if(newNode->nData > *(oListData.setMid()))    // 노드가 tail에 가까울때,
+        else if(newNode->nData > mid)    // 노드가 tail에 가까울때,
         {
             if (!pTail->pPrev || pTail->nData < newNode->nData)    // 리스트에 노드가 한개뿐일때 혹은 새 노드의 데이터가 최대값일때,
             {
