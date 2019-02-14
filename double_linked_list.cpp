@@ -19,40 +19,53 @@ typedef struct node
     struct node* pPrev;
 }node;
 
-node* head = NULL;
-node* tail = NULL;
-
-int nodeCount = 0;  // 클래스 내부에 숨겨두면서도 값을 처음 한번만 초기화시키는 방법은?
-int nDataSum = 0;
-float mid = 0;
-
 
 class listData
 {
+private:
     
-    
+    int nodeCount;
+    int nDataSum;
+    float mid;
     
 public:
-//    listData(void)  // insert() 내부에서 클래스 객체oListData를 만들 때마다 생성자로 초기화됨.
-//    {
-//        nodeCount = 0;
-//        nDataSum = 0;
-//        mid = 0;
-//    }
     
-    float midCalc(int nData)
+    listData(void)  // 생성자를 프라이빗으로 빼면 객체 생성을 할 수 없는건가?
     {
-        nDataSum += nData;
+        nodeCount = 0;
+        nDataSum = 0;
+        mid = 0;
+    }
+    
+    float insertNodeData(int nodeData)
+    {
+        nDataSum += nodeData;
         nodeCount++;
-        
+
         mid = nDataSum / nodeCount;
-        
         return mid;
     }
     
+    float deleteNodeData(int nodeData)
+    {
+        nDataSum -= nodeData;
+        nodeCount--;
+
+        mid = nDataSum / nodeCount;
+        return mid;
+    }
     
-    
+    float* setMid(void)
+    {
+        return &mid;
+    }
 };
+
+
+node* head = NULL;
+node* tail = NULL;
+listData oListData;
+
 
 
 void insert(int, node**, node**);    // 노드 삽입함수. 삽입하면 자동 nData 기준 오름차순 정렬후 삽입한다.
@@ -135,12 +148,9 @@ void insert(int data, node** headAddr, node** tailAddr)
     newNode->nData = data;
     newNode->pNext = NULL;
     newNode->pPrev = NULL;
+    oListData.insertNodeData(data);
     
-    
-    listData oListData;
-    oListData.midCalc(data);
-    
-    
+
     
     if (*headAddr == NULL && *tailAddr == NULL)    // 링크상의 노드가 하나도 없다면,
     {
@@ -174,7 +184,7 @@ void insert(int data, node** headAddr, node** tailAddr)
         
       
         
-        if (newNode->nData <= mid)    // 노드가 head에 가깝거나 정 가운데일때,
+        if (newNode->nData <= *(oListData.setMid()))    // 노드가 head에 가깝거나 정 가운데일때,
         {
             if (!pHead->pNext || pHead->nData > newNode->nData)    // 리스트에 노드가 한개뿐일때 혹은 새 노드의 데이타가 최소값일때,
             {
@@ -196,7 +206,7 @@ void insert(int data, node** headAddr, node** tailAddr)
                 pHead->pNext = newNode;
             }
         }
-        else if(newNode->nData > mid)    // 노드가 tail에 가까울때,
+        else if(newNode->nData > *(oListData.setMid()))    // 노드가 tail에 가까울때,
         {
             if (!pTail->pPrev || pTail->nData < newNode->nData)    // 리스트에 노드가 한개뿐일때 혹은 새 노드의 데이터가 최대값일때,
             {
@@ -300,8 +310,8 @@ void deleteNode(int data, node** headAddr, node** tailAddr)
     int tailDepth = 0;
     node* pHead = *headAddr;
     node* pTail = *tailAddr;
-    
     headDepth = find(data, pHead, pTail, &tailDepth);
+    oListData.deleteNodeData(data);
     
     if (headDepth == 1)    // 삭제 대상 노드가 헤드노드라면,
     {
