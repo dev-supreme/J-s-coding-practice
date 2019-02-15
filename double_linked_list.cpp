@@ -7,7 +7,6 @@
 //
 //
 //  이중 연결리스트 구현.
-//  리스트 정보만 따로 담는 클래스 listInfo를 만들어서 거기에 노드 중간합, 노드 개수를 만들고 노드 중간합과 노드 개수를 이용해서 평균값을 자동적으로 산출하게 할 것.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,10 +18,15 @@ typedef struct node
     struct node* pPrev;
 }node;
 
+enum InsertOrDelete    // 노드 삽입 혹은 삭제 선택
+{
+    INSERTNODE = 1,
+    DELETENODE = -1,
+};
 
 class listData
 {
-private:    // 클래스 내부에서는 생각없이 쓸 수 있지만, 클래스 외부에서는 반환만 하는 함수없이는 쓸 수 없다.
+private:
     
     int nodeCount;  // 노드 개수.
     int nDataSum;   // nData 총합.
@@ -37,23 +41,24 @@ public:
         mid = 0;
     }
     
-    void insertNodeData(int nodeData)   // 이 함수로 mid를 반환할 이유가 없으므로 반환형을 float->void 변경.
+    void getMid(int nodeData, InsertOrDelete iod)
     {
-        nDataSum += nodeData;
-        nodeCount++;
+        nDataSum += nodeData * iod;
+        nodeCount += iod;
+//        nodeCount++;
 
         mid = nDataSum / nodeCount;
     }
     
-    void deleteNodeData(int nodeData)   // 이 함수로 mid를 반환할 이유가 없으므로 반환형을 float->void 변경.
-    {
-        nDataSum -= nodeData;
-        nodeCount--;
-
-        mid = nDataSum / nodeCount;
-    }
+//    void deleteNodeData(int nodeData)     함수 하나로 통합.
+//    {
+//        nDataSum -= nodeData;
+//        nodeCount--;
+//
+//        mid = nDataSum / nodeCount;
+//    }
     
-    float setMid(void)                  // mid의 값만 클래스 외부에 전달하면 되므로 반환형을 float*->float으로 변경.
+    float setMid(void)
     {
         return mid;
     }
@@ -146,7 +151,7 @@ void insert(int data, node** headAddr, node** tailAddr)
     newNode->nData = data;
     newNode->pNext = NULL;
     newNode->pPrev = NULL;
-    oListData.insertNodeData(data);
+    oListData.getMid(data, INSERTNODE);
     
     if (*headAddr == NULL && *tailAddr == NULL)    // 링크상의 노드가 하나도 없다면,
     {
@@ -155,9 +160,13 @@ void insert(int data, node** headAddr, node** tailAddr)
     }
     else
     {
+        
         node* pHead = *headAddr;
         node* pTail = *tailAddr;
+
         float mid = oListData.setMid();
+        
+        
         
         if (newNode->nData <= mid)    // 노드가 head에 가깝거나 정 가운데일때,
         {
@@ -286,7 +295,7 @@ void deleteNode(int data, node** headAddr, node** tailAddr)
     node* pHead = *headAddr;
     node* pTail = *tailAddr;
     headDepth = find(data, pHead, pTail, &tailDepth);
-    oListData.deleteNodeData(data);
+    oListData.getMid(data, DELETENODE);
     
     if (headDepth == 1)    // 삭제 대상 노드가 헤드노드라면,
     {
